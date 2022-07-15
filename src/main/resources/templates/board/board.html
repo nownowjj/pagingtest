@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet"/>
+
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+</head>
+<th:block layout:fragment="script">
+    <script>
+    $(document).ready(function(){
+        $("#searchBtn").on("click",function(e) {
+            e.preventDefault();
+            page(0);
+        });
+
+    });
+     function page(page){
+		var searchDateType = $("#searchDateType").val();
+        var searchBy = $("#searchBy").val();
+        var searchQuery = $("#searchQuery").val();
+        console.log(searchBy);
+        console.log(searchQuery);
+
+        
+        
+        location.href="/board/" + page + "?searchDateType=" + searchDateType
+            + "&searchBy=" + searchBy
+            + "&searchQuery=" + searchQuery;
+    }
+
+
+    </script>
+</th:block>
+<th:block layout:fragment="css">
+    <style>
+
+        .buttonRight{
+            display:block;
+            float:right;
+            padding-right:20px;
+        }
+        
+        .pagination{
+	        display: flex;
+		    width: 100%;
+		    margin-top: 100px;
+		    list-style: none;
+		    border-radius: 0.25rem;
+        }
+
+    </style>
+</th:block>
+
+
+<body>
+
+<div class="container mt-3">
+        <h2>공지사항</h2>
+        <br/>
+        <div class="form-inline justify-content-right" th:object="${boardSearchDto}">
+            <div class="row">
+                <select th:field="*{searchBy}" class="form-select" style="width:auto;">
+                        <option value="subject">제목</option>
+						<option value="contents">내용</option>
+                </select>
+                <div class="col-sm-3">
+                    <input th:field="*{searchQuery}" type="text" class="form-control" placeholder="검색어를 입력해주세요">
+                </div>
+
+                <div class="col-sm-3">
+                    <button id="searchBtn" type="submit" class="btn btn-dark">검색</button>
+                </div></div></div>
+
+
+        <table class="table" border="1">
+            <thead>
+            <tr>
+                <th>공지사항 순번</th>
+                <th>공지사항 name</th>
+                <th>공지사항 subject</th>
+                <th>공지사항 contents</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="data, status: ${datas.getContent()}">
+                <td th:text="${data.id}"></td>
+                <td th:text="${data.name}"></td>
+                <td th:text="${data.subject}"></td>
+                <td th:text="${data.contents}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <div th:with="start=${(datas.number/maxPage)*maxPage + 1}, end=(${(datas.totalPages == 0) ? 1 : (start + (maxPage - 1) < datas.totalPages ? start + (maxPage - 1) : datas.totalPages)})" >
+            <ul class="pagination justify-content-center">
+
+                <li class="page-item" th:classappend="${datas.first}?'disabled'">
+                    <a th:onclick="'javascript:page(' + ${datas.number - 1} + ')'" aria-label='Previous' class="page-link">
+                        <span aria-hidden='true'>Previous</span>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${datas.number eq page-1}?'active':''">
+                    <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
+                </li>
+
+                <li class="page-item" th:classappend="${datas.last}?'disabled'">
+                    <a th:onclick="'javascript:page(' + ${datas.number + 1} + ')'" aria-label='Next' class="page-link">
+                        <span aria-hidden='true'>Next</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+
+
+    </div>
+</body>
+</html>
